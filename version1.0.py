@@ -1,4 +1,4 @@
-from math import sqrt
+from math import sqrt, fabs
 import random
 
 # Node of Tree
@@ -42,7 +42,7 @@ class Cell:
 
 
 	def heuristic(self, end):
-		return sqrt(end.i**2 + end.j**2)
+		return fabs(self.i - end.i) + fabs(self.j - end.j)
 
 # Tree or Labirinth
 class Field:
@@ -81,6 +81,7 @@ class Field:
 
 		return list(reversed(path))
 
+
 	def show(self):
 		for i in range(self.row):
 			output = ''
@@ -88,9 +89,25 @@ class Field:
 				output += '#' if self.field[i][j].wall else '+'
 			print(output)
 
+	def showpath(self,min_path):
+		flag = False
+		for i in range(self.row):
+			output = ''
+			for j in range(self.col):
+				if(self.field[i][j].wall): output += '#'
+				else:
+					for position in min_path:
+						if(position.i == i and position.j == j):
+							output += ' '
+							flag = True
+					if(not flag): output += '+'
+					flag = False
+			print(output)
+
+
 
 # Options
-row, col = 50, 50
+row, col = 25, 35
 min_path = list()
 output = ''
 
@@ -105,8 +122,7 @@ if __name__ == '__main__':
 	start = box.field[0][0]
 	start.wall = False
 	open_set.append(start)
-	# Start index of vertex (index of min)
-	winner = 0
+	
 	# Set end vertex
 	end = box.field[row - 1][col - 1]
 	end.wall = False
@@ -118,11 +134,13 @@ if __name__ == '__main__':
 	"""
 
 	while len(open_set) > 0:
-
+		# Start index of vertex (index of min)
+		winner = 0
 		# Taking vertex with min 'f'
 		for i in range(len(open_set)):
 			if open_set[i].f < open_set[winner].f:
 				winner = i
+
 		# Assigning this vertex to 'current' 
 		current = open_set[winner]
 
@@ -158,5 +176,6 @@ if __name__ == '__main__':
 		for position in min_path:
 			output += '(' + str(position.i) + ',' + str(position.j) + ')'
 		print(output)
+		box.showpath(min_path)
 	else:
 		print('no solution!')
